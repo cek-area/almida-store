@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Almida Store</title>
+<style>
+:root{--ink:#172033;--muted:#687386;--line:#e7eaf0;--blue:#246bfe;--bg:#f5f7fb;--green:#15803d;--red:#dc2626}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;color:var(--ink)}
+header{background:#fff;border-bottom:1px solid var(--line);padding:14px 18px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:2}
+.logo{width:42px;height:42px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}.logo img{width:100%;height:100%;object-fit:contain}
+header h1{font-size:18px;margin:0}header small{display:block;color:var(--muted);font-size:12px}
+.wrap{max-width:1100px;margin:22px auto;padding:0 14px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.stat,.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:16px}.stat span{font-size:12px;color:var(--muted)}.stat b{display:block;font-size:25px;margin-top:4px}
+.layout{display:grid;grid-template-columns:360px 1fr;gap:16px}.panel h2{font-size:16px;margin:0 0 14px}
+label{display:block;font-size:12px;font-weight:650;color:#4b5563;margin:10px 0 5px}
+input,select,textarea{width:100%;border:1px solid #dce1e9;border-radius:10px;padding:10px 11px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:72px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.checks{display:flex;gap:15px;margin:12px 0}.checks label{display:flex;align-items:center;gap:6px;margin:0;font-size:13px}.checks input{width:auto}
+.btn{border:0;border-radius:10px;padding:10px 13px;font-weight:650;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#eef2ff;color:#2949a3}.danger{background:#fee2e2;color:#991b1b}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.toolbar{display:flex;gap:8px;margin-bottom:12px}.toolbar input{flex:1}.list{display:grid;gap:9px}
+.product{border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;gap:12px;align-items:center}.thumb{width:54px;height:54px;flex-shrink:0;border-radius:10px;background:#f2f4f8;display:grid;place-items:center;font-size:22px;overflow:hidden}.thumb img{width:100%;height:100%;object-fit:cover}.pinfo{min-width:0;flex:1}.pinfo b{display:block;overflow-wrap:anywhere}.meta{font-size:12px;color:var(--muted)}.tag{display:inline-block;padding:2px 7px;border-radius:20px;background:#eef2ff;color:#3649a6;font-size:11px;margin:3px 3px 0 0}.tag.off{background:#f1f5f9;color:#64748b}.pbuttons{display:flex;gap:5px}.pbuttons button{padding:7px 9px;font-size:12px}
+.notice{font-size:12px;color:var(--muted);margin-top:10px}.empty{padding:25px;text-align:center;color:var(--muted)}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.stats{gap:8px}.stat{padding:12px}.stat b{font-size:21px}.product{align-items:flex-start}.pbuttons{flex-direction:column}}
+</style></head>
+<body>
+<header><div class="logo"><img src="assets/logo.jpg" alt="Logo"></div><div><h1>Almida Store · Admin</h1><small>Kelola katalog, harga, diskon & promo</small></div></header>
+<div class="wrap">
+<div class="stats"><div class="stat"><span>Total produk</span><b id="total">0</b></div><div class="stat"><span>Produk aktif</span><b id="active">0</b></div><div class="stat"><span>Promo aktif</span><b id="promos">0</b></div></div>
+<div class="layout">
+<section class="panel"><h2 id="formTitle">Tambah produk baru</h2>
+<form id="form">
+<input type="hidden" id="pid">
+<label>Nama produk *</label><input id="name" required placeholder="Contoh: Paket Data 10 GB">
+<label>Kategori *</label><select id="category"><option>Paket data</option><option>Masa aktif</option><option>Aplikasi premium</option><option>Produk digital lainnya</option></select>
+<div class="two"><div><label>Harga jual (Rp) *</label><input id="price" type="number" min="0" required placeholder="15000"></div><div><label>Harga normal/coret</label><input id="oldPrice" type="number" min="0" placeholder="20000"></div></div>
+<label>Diskon (%)</label><input id="discount" type="number" min="0" max="100" value="0">
+<label>Deskripsi</label><textarea id="description" placeholder="Keterangan singkat produk"></textarea>
+<div class="two"><div><label>Emoji/icon</label><input id="emoji" value="🛍️"></div><div><label>Gambar (URL/path)</label><input id="image" placeholder="assets/produk.jpg"></div></div>
+<div class="checks"><label><input id="promo" type="checkbox"> Tandai promo</label><label><input id="activeCheck" type="checkbox" checked> Produk aktif</label></div>
+<div class="actions"><button class="btn primary" type="submit" id="saveBtn">Simpan produk</button><button class="btn secondary" type="button" id="reset">Bersihkan</button></div>
+<div class="notice">Data tersimpan sementara di browser sampai kamu mengekspor products.json. Setelah itu ganti file di repository dan push melalui Termux.</div>
+</form></section>
+<section class="panel"><h2>Katalog produk</h2><div class="toolbar"><input id="search" placeholder="Cari nama produk..."><button class="btn secondary" id="importBtn">Import JSON</button><input type="file" id="importFile" accept=".json,application/json" hidden></div>
+<div id="products" class="list"></div><div class="actions"><button class="btn primary" id="export">⬇ Ekspor products.json</button><button class="btn secondary" id="downloadBackup">Backup JSON</button></div>
+<div class="notice">Ekspor akan mengunduh file products.json yang siap dipasang ke website GitHub Pages.</div></section>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);let items=[];
+const fields=['name','category','price','oldPrice','discount','description','emoji','image'];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function stats(){$('total').textContent=items.length;$('active').textContent=items.filter(p=>p.active!==false).length;$('promos').textContent=items.filter(p=>p.active!==false&&p.promo).length}
+function render(){stats();let q=$('search').value.toLowerCase();let filtered=items.filter(p=>(p.name||'').toLowerCase().includes(q));$('products').innerHTML=filtered.length?filtered.map(p=>`<article class="product"><div class="thumb">${p.image?`<img src="${esc(p.image)}" onerror="this.remove()">`:esc(p.emoji||'🛍️')}</div><div class="pinfo"><b>${esc(p.name)}</b><div>${esc(p.category)} · Rp${Number(p.price||0).toLocaleString('id-ID')}</div><div class="meta">${p.discount?`Diskon ${p.discount}% · `:''}${p.promo?'PROMO · ':''}${p.active===false?'Nonaktif':'Aktif'}</div><span class="tag">${esc(p.id)}</span>${p.promo?'<span class="tag">PROMO</span>':''}${p.active===false?'<span class="tag off">NONAKTIF</span>':''}</div><div class="pbuttons"><button class="btn secondary" onclick="edit('${esc(p.id)}')">Edit</button><button class="btn secondary" onclick="toggle('${esc(p.id)}')">${p.active===false?'Aktifkan':'Nonaktif'}</button><button class="btn danger" onclick="del('${esc(p.id)}')">Hapus</button></div></article>`).join(''):'<div class="empty">Belum ada produk. Tambahkan produk dari formulir di sebelah kiri.</div>'}
+function clearForm(){ $('form').reset();$('pid').value='';$('discount').value=0;$('emoji').value='🛍️';$('activeCheck').checked=true;$('formTitle').textContent='Tambah produk baru';$('saveBtn').textContent='Simpan produk'}
+function edit(id){let p=items.find(x=>String(x.id)===String(id));if(!p)return;$('pid').value=p.id;fields.forEach(k=>$(k).value=p[k]??(k==='emoji'?'🛍️':''));$('promo').checked=!!p.promo;$('activeCheck').checked=p.active!==false;$('formTitle').textContent='Edit produk · '+p.id;$('saveBtn').textContent='Simpan perubahan';window.scrollTo({top:0,behavior:'smooth'})}
+function toggle(id){let p=items.find(x=>String(x.id)===String(id));if(p){p.active=p.active===false;render()}}
+function del(id){if(confirm('Hapus produk '+id+'?')){items=items.filter(x=>String(x.id)!==String(id));render()}}
+$('form').addEventListener('submit',e=>{e.preventDefault();let id=$('pid').value;let obj={id:id||'AS-'+String(Date.now()).slice(-6),name:$('name').value.trim(),category:$('category').value,price:Number($('price').value||0),oldPrice:Number($('oldPrice').value||0),discount:Number($('discount').value||0),description:$('description').value.trim(),emoji:$('emoji').value.trim()||'🛍️',image:$('image').value.trim(),promo:$('promo').checked,active:$('activeCheck').checked};if(obj.discount<0||obj.discount>100){alert('Diskon harus 0–100%.');return}if(id){items=items.map(p=>String(p.id)===String(id)?obj:p)}else{if(items.some(p=>String(p.id)===obj.id)){obj.id+='X'}items.push(obj)}render();clearForm()});
+$('reset').onclick=clearForm;$('search').oninput=render;
+function exportJSON(){let blob=new Blob([JSON.stringify(items,null,2)+'\\n'],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='products.json';a.click();URL.revokeObjectURL(a.href)}
+$('export').onclick=exportJSON;$('downloadBackup').onclick=exportJSON;
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let data=JSON.parse(await f.text());if(!Array.isArray(data))throw Error('JSON harus berupa array produk');if(confirm('Ganti katalog saat ini dengan '+data.length+' produk dari file?')){items=data;render();clearForm()}}catch(err){alert('Import gagal: '+err.message)}e.target.value=''};
+fetch('products.json').then(r=>r.ok?r.json():[]).then(data=>{if(Array.isArray(data))items=data;render()}).catch(()=>render());
+</script></body></html>
